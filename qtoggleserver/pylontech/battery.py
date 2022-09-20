@@ -1,6 +1,6 @@
 import time
 
-from typing import Any, Dict, Optional, List, Type, Union
+from typing import Any, Optional, Union
 
 from pylontech import Pylontech
 
@@ -16,7 +16,7 @@ class Battery(polled.PolledPeripheral):
     def __init__(
         self,
         *,
-        dev_ids: List[int],
+        dev_ids: list[int],
         serial_port: str = DEFAULT_SERIAL_PORT,
         serial_baud: int = DEFAULT_SERIAL_BAUD,
         **kwargs,
@@ -25,10 +25,10 @@ class Battery(polled.PolledPeripheral):
 
         self._serial_port: str = serial_port
         self._serial_baud: int = serial_baud
-        self._dev_ids: List[int] = dev_ids
-        self._statuses_by_dev_id: Dict[int, Dict[str, Any]] = {}
+        self._dev_ids: list[int] = dev_ids
+        self._statuses_by_dev_id: dict[int, dict[str, Any]] = {}
 
-    async def make_port_args(self) -> List[Union[Dict[str, Any], Type[core_ports.BasePort]]]:
+    async def make_port_args(self) -> list[Union[dict[str, Any], type[core_ports.BasePort]]]:
         from .ports import SocPort, TemperaturePort, CurrentPort, VoltagePort, PowerPort, CyclesPort
 
         status_port_drivers = [SocPort, TemperaturePort, CurrentPort, VoltagePort, PowerPort, CyclesPort]
@@ -63,7 +63,7 @@ class Battery(polled.PolledPeripheral):
             'cycles': values.CycleNumber,
         }
 
-    def get_aggregated_status(self) -> Optional[Dict[str, Any]]:
+    def get_aggregated_status(self) -> Optional[dict[str, Any]]:
         if not self._statuses_by_dev_id:
             return None
 
