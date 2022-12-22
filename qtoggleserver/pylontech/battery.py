@@ -1,3 +1,4 @@
+import logging
 import time
 
 from typing import Any, Optional, Union
@@ -12,6 +13,8 @@ class Battery(polled.PolledPeripheral):
     DEFAULT_POLL_INTERVAL = 60
     DEFAULT_SERIAL_PORT = '/dev/ttyUSB0'
     DEFAULT_SERIAL_BAUD = 115200
+
+    logger = logging.getLogger(__name__)
 
     def __init__(
         self,
