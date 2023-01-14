@@ -1,4 +1,5 @@
 import logging
+import re
 import time
 
 from typing import Any, Optional, Union
@@ -7,6 +8,36 @@ from pylontech import Pylontech
 
 from qtoggleserver.core import ports as core_ports
 from qtoggleserver.lib import polled
+
+
+class ImprovedPylontech(Pylontech):
+    CHUNK_SIZE = 1024
+
+    def __init__(self, *args, **kwargs) -> None:
+        self._buffer: bytes = b''
+        super().__init__(*args, **kwargs)
+
+    def read_line(self) -> bytes:
+        parts = re.split(rb'[\r\n]', self._buffer, maxsplit=1)
+        if len(parts) > 1:
+            line, self._buffer = parts
+            return line.strip(b'\xff') + b'\n'
+
+        data = self.s.read(self.CHUNK_SIZE)
+        parts = re.split(rb'[\r\n]', data, maxsplit=1)
+        if len(parts) > 1:
+            line, rest = parts
+            self._buffer += rest
+            return line.strip(b'\xff') + b'\n'
+        else:
+            self._buffer += data
+            return b''
+
+    def read_frame(self) -> Any:
+        raw_frame = self.read_line()
+        f = self._decode_hw_frame(raw_frame=raw_frame)
+        parsed = self._decode_frame(f)
+        return parsed
 
 
 class Battery(polled.PolledPeripheral):
@@ -46,7 +77,7 @@ class Battery(polled.PolledPeripheral):
         return port_args
 
     async def poll(self) -> None:
-        pylontech = Pylontech(self._serial_port, self._serial_baud)
+        pylontech = ImprovedPylontech(self._serial_port, self._serial_baud)
         try:
             for dev_id in self._dev_ids:
                 status = await self.run_threaded(self._poll_dev, pylontech, dev_id)
