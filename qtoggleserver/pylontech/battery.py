@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import re
 import time
@@ -44,7 +45,9 @@ class Battery(polled.PolledPeripheral):
     DEFAULT_POLL_INTERVAL = 60
     DEFAULT_SERIAL_PORT = '/dev/ttyUSB0'
     DEFAULT_SERIAL_BAUD = 115200
-    READ_RETRY_COUNT = 3
+    READ_RETRY_COUNT = 5
+    READ_RETRY_SLEEP = 3
+    READ_DEVS_INTERSLEEP = 1  # seconds
 
     logger = logging.getLogger(__name__)
 
@@ -78,24 +81,31 @@ class Battery(polled.PolledPeripheral):
         return port_args
 
     async def poll(self) -> None:
-        pylontech = ImprovedPylontech(self._serial_port, self._serial_baud)
-        try:
-            for dev_id in self._dev_ids:
-                status = await self.run_threaded(self._poll_dev, pylontech, dev_id)
-                self._statuses_by_dev_id[dev_id] = status
-        finally:
-            pylontech.s.close()
+        for dev_id in self._dev_ids:
+            status = await self.run_threaded(self._poll_dev, dev_id)
+            await asyncio.sleep(self.READ_DEVS_INTERSLEEP)  # sleep between reading multiple devices
+            self._statuses_by_dev_id[dev_id] = status
 
-    def _poll_dev(self, pylontech: Pylontech, dev_id: int) -> dict:
+    def _poll_dev(self, dev_id: int) -> dict:
         values = None
         for count in range(self.READ_RETRY_COUNT):
+            pylontech = ImprovedPylontech(self._serial_port, self._serial_baud)
             try:
                 values = pylontech.get_values_single(dev_id)
+                break
             except Exception:
                 if count >= self.READ_RETRY_COUNT - 1:
                     raise
                 else:
-                    continue
+                    self.logger.warning(
+                        'reading values for device %s failed (retry=%d/%d)',
+                        dev_id,
+                        count + 1,
+                        self.READ_RETRY_COUNT - 1
+                    )
+                    time.sleep(self.READ_RETRY_SLEEP)
+            finally:
+                pylontech.s.close()
 
         return {
             'timestamp': int(time.time()),
