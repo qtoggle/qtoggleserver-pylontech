@@ -4,8 +4,6 @@ This is an addon for [qToggleServer](https://github.com/qtoggle/qtoggleserver).
 
 It provides Pylontech batteries support for qToggleServer.
 
-Currently, only status reading is supported. No changes to the inverter configuration can be done via this add-on.
-
 
 ## Install
 
