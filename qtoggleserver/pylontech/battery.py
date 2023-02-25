@@ -44,6 +44,7 @@ class Battery(polled.PolledPeripheral):
     DEFAULT_POLL_INTERVAL = 60
     DEFAULT_SERIAL_PORT = '/dev/ttyUSB0'
     DEFAULT_SERIAL_BAUD = 115200
+    READ_RETRY_COUNT = 3
 
     logger = logging.getLogger(__name__)
 
@@ -86,7 +87,16 @@ class Battery(polled.PolledPeripheral):
             pylontech.s.close()
 
     def _poll_dev(self, pylontech: Pylontech, dev_id: int) -> dict:
-        values = pylontech.get_values_single(dev_id)
+        values = None
+        for count in range(self.READ_RETRY_COUNT):
+            try:
+                values = pylontech.get_values_single(dev_id)
+            except Exception:
+                if count >= self.READ_RETRY_COUNT - 1:
+                    raise
+                else:
+                    continue
+
         return {
             'timestamp': int(time.time()),
             'soc': values.StateOfCharge,
