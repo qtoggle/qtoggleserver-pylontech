@@ -97,7 +97,7 @@ class Battery(polled.PolledPeripheral):
                 if count >= self.READ_RETRY_COUNT - 1:
                     raise
                 else:
-                    self.logger.warning(
+                    self.warning(
                         'reading values for device %s failed (retry=%d/%d)',
                         dev_id,
                         count + 1,
