@@ -8,7 +8,7 @@ from .battery import Battery
 
 
 class BatteryStatusPort(polled.PolledPort):
-    PROPERTY = ''
+    PROPERTY = ""
 
     @classmethod
     def get_property(cls) -> str:
@@ -28,29 +28,29 @@ class BatteryStatusPort(polled.PolledPort):
 
 class SocPort(BatteryStatusPort):
     TYPE = core_ports.TYPE_NUMBER
-    PROPERTY = 'soc'
+    PROPERTY = "soc"
 
 
 class TemperaturePort(BatteryStatusPort):
     TYPE = core_ports.TYPE_NUMBER
-    PROPERTY = 'temperature'
+    PROPERTY = "temperature"
 
 
 class CurrentPort(BatteryStatusPort):
     TYPE = core_ports.TYPE_NUMBER
-    PROPERTY = 'current'
+    PROPERTY = "current"
 
 
 class VoltagePort(BatteryStatusPort):
     TYPE = core_ports.TYPE_NUMBER
-    PROPERTY = 'voltage'
+    PROPERTY = "voltage"
 
 
 class PowerPort(BatteryStatusPort):
     TYPE = core_ports.TYPE_NUMBER
-    PROPERTY = 'power'
+    PROPERTY = "power"
 
 
 class CyclesPort(BatteryStatusPort):
     TYPE = core_ports.TYPE_NUMBER
-    PROPERTY = 'cycles'
+    PROPERTY = "cycles"
