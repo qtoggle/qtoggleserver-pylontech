@@ -1,4 +1,6 @@
 from .battery import Battery
 
 
-VERSION = 'unknown'
+__all__ = ["Battery"]
+
+VERSION = "unknow-version"
