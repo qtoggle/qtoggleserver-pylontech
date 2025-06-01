@@ -3,4 +3,4 @@ from .battery import Battery
 
 __all__ = ["Battery"]
 
-VERSION = "unknown"
+VERSION = "unknow-version"
