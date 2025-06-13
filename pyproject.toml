@@ -1,6 +1,6 @@
 [project]
 name = "qtoggleserver-pylontech"
-version = "unknown-version"
+version = "0.0.0"
 description = "Pylontech batteries support for qToggleServer"
 authors = [
     {name = "Calin Crisan", email = "ccrisan@gmail.com"},
@@ -15,7 +15,8 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-  "ruff",
+    "pre-commit",
+    "ruff",
 ]
 
 [tool.ruff]
