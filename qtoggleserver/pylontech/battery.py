@@ -5,9 +5,10 @@ import time
 
 from typing import Any
 
-from pylontech import Pylontech
 from qtoggleserver.core import ports as core_ports
 from qtoggleserver.lib import polled
+
+from pylontech import Pylontech
 
 
 class ImprovedPylontech(Pylontech):
